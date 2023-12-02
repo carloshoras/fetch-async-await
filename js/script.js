@@ -8,14 +8,14 @@ const resetBtn = document.getElementById('resetBtn')
 const inputField = document.getElementById('searchInput')
 
 
-const print = (pokemon, url) => {
-        url = `https://img.pokemondb.net/sprites/home/normal/${pokemon}.png`
-        app.innerHTML += `
-        <div class="card">
-        <img src="${url}" alt="image of ${pokemon}" />
-        <p>${pokemon}</p>
-        </div>
-        `
+const print = (pokemon) => {
+    const url = `https://img.pokemondb.net/sprites/home/normal/${pokemon}.png`
+    app.innerHTML += `
+    <div class="card">
+    <img src="${url}" alt="image of ${pokemon}" />
+    <p>${pokemon}</p>
+    </div>
+    `
 }
 
 const apiPokemon = async (url) => {
@@ -26,18 +26,24 @@ const apiPokemon = async (url) => {
         }
         const pokemons = await res.json()
         app.innerHTML = ''
+        if(!pokemons.results && res.ok) {
+            return true
+        }
         for (let pokemon of pokemons.results) {
             print(pokemon.name)
-            console.log(pokemon.url)
         }
         next = pokemons.next
         prev = pokemons.previous
     } catch (error) {
-        console.log('Error al obtener los datos', error);
+        if('0123456789'.indexOf(url[(url.length)-1]) == -1) {
+            return false
+        }
+        console.log('Error al obtener los datos ', error);
     }
 }
 
 apiPokemon('https://pokeapi.co/api/v2/pokemon?limit=10')
+
 nextBtn.addEventListener('click', () => {
     if (next) {
         apiPokemon(next)
@@ -50,5 +56,19 @@ prevBtn.addEventListener('click', () => {
 })
 searchBtn.addEventListener('click', () => {
     url = `https://pokeapi.co/api/v2/pokemon/${inputField.value}`
+    apiPokemon(url).then((resp) => {
+        if (resp == true) {
+            print(inputField.value)
+        } else if (resp==false){
+            app.innerHTML = `
+            <div class="card">
+            <p>Ese pokemon no existe</p>
+            </div>
+            `
+        }
+    })
+})
+resetBtn.addEventListener('click', () => {
+    apiPokemon('https://pokeapi.co/api/v2/pokemon?limit=10')
 })
 
