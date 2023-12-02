@@ -7,14 +7,32 @@ const nextBtn = document.getElementById('nextBtn')
 const resetBtn = document.getElementById('resetBtn')
 const inputField = document.getElementById('searchInput')
 
+function chequeaPokemonFav() {
+    const listaPkmn = document.querySelectorAll(".card")
+    const estrella = document.querySelectorAll(".card .fav")
+    listaPkmn.forEach((card, index) => {
+        card.addEventListener('click', () => {
+            if (localStorage.getItem(card.id)) {
+                localStorage.removeItem(card.id)
+                estrella[index].style="display:none"
+            } else {
+                localStorage.setItem(card.id, card.id)
+                estrella[index].style="display:visible"
+            }
+        })
+    })
+}
 
 const print = (pokemon) => {
     let pokemonName = pokemon.toUpperCase()
     const url = `https://img.pokemondb.net/sprites/home/normal/${pokemon}.png`
     app.innerHTML += `
-    <div class="card">
-    <img src="${url}" alt="image of ${pokemonName}" />
+    <div class="card" id="${pokemon}">
+    <img src="${url}" alt="${pokemonName}" />
+    <div class="nameFav">
     <p>${pokemonName}</p>
+    <img src="./assets/img/star.png" style="display:none" alt="fav" class="fav" />
+    </div>
     </div>
     `
 }
@@ -33,6 +51,7 @@ const apiPokemon = async (url) => {
         for (let pokemon of pokemons.results) {
             print(pokemon.name)
         }
+        chequeaPokemonFav()
         next = pokemons.next
         prev = pokemons.previous
     } catch (error) {
@@ -61,6 +80,7 @@ searchBtn.addEventListener('click', () => {
     apiPokemon(url).then((resp) => {
         if (resp == true) {
             print(wantedPokemon)
+            chequeaPokemonFav()
         } else if (resp==false){
             app.innerHTML = `
             <div class="card">
@@ -72,5 +92,6 @@ searchBtn.addEventListener('click', () => {
 })
 resetBtn.addEventListener('click', () => {
     apiPokemon('https://pokeapi.co/api/v2/pokemon?limit=10')
+    localStorage.clear()
 })
 
