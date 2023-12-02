@@ -9,11 +9,12 @@ const inputField = document.getElementById('searchInput')
 
 
 const print = (pokemon) => {
+    let pokemonName = pokemon.toUpperCase()
     const url = `https://img.pokemondb.net/sprites/home/normal/${pokemon}.png`
     app.innerHTML += `
     <div class="card">
-    <img src="${url}" alt="image of ${pokemon}" />
-    <p>${pokemon}</p>
+    <img src="${url}" alt="image of ${pokemonName}" />
+    <p>${pokemonName}</p>
     </div>
     `
 }
@@ -55,10 +56,11 @@ prevBtn.addEventListener('click', () => {
     }
 })
 searchBtn.addEventListener('click', () => {
-    url = `https://pokeapi.co/api/v2/pokemon/${inputField.value}`
+    const wantedPokemon = inputField.value.toLowerCase()
+    url = `https://pokeapi.co/api/v2/pokemon/${wantedPokemon}`
     apiPokemon(url).then((resp) => {
         if (resp == true) {
-            print(inputField.value)
+            print(wantedPokemon)
         } else if (resp==false){
             app.innerHTML = `
             <div class="card">
